@@ -14,5 +14,6 @@ if __name__ == "__main__":
     K_array = [5, 10, 20]
     e_array = [0.1, 0.2, 0.4]
 
-    for K, e in zip(K_array, e_array):
-        print(f'K = {K}, e = {e} - {calc(K, e)}')
+    for K in K_array:
+        for e in e_array:
+            print(f'K = {K}, e = {e} - {calc(K, e)}')
