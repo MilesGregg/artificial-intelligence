@@ -22,5 +22,20 @@ def step(r, w):
     return 1.0 if summation >= 0.0 else 0.0
 
 if __name__ == "__main__":
-    for 
-    print()
+    iterations = 10000
+    rate = 0.0001
+
+    weights = [0.0 for i in range(len(data[0]))]
+
+    for i in range(iterations):
+        sum_error = 0
+        for row in data:
+            error = row[-1] - step(row, weights)
+            sum_error += error**2
+            weights[0] = weights[0] + rate * error
+            for j in range(len(row)-1):
+                weights[j + 1] = weights[j + 1] + rate * error * row[j]
+
+        print('iteration=%d, lrate=%.3f, error=%.3f' % (i, rate, sum_error))
+
+    print(weights)

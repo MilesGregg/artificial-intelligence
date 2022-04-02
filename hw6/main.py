@@ -16,4 +16,4 @@ if __name__ == "__main__":
 
     for K in K_array:
         for e in e_array:
-            print(f'K = {K}, e = {e} - {calc(K, e)}')
+            print(f'K = {K}, ε = {e} - {calc(K, e)}')
