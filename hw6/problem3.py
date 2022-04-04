@@ -1,11 +1,12 @@
 import math
 
+
 def calc(K, e):
     summation = 0
     for i in range(int((K+1)/2), K):
         vec = math.factorial(K) / (math.factorial(i) * math.factorial(K-i))
         output = vec * math.pow(e, i) * math.pow(1 - e, K - i)
-        summation = summation + output
+        summation += output
 
     return summation
 

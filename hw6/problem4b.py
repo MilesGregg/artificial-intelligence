@@ -1,103 +1,25 @@
-import numpy as np
+from matplotlib import pyplot as plt
+from sklearn import tree
 
-
-# Split a dataset based on an attribute and an attribute value
-def test_split(index, value, dataset):
-    left = []
-    right = []
-    for row in dataset:
-        if row[index] < value:
-            left.append(row)
-        else:
-            right.append(row)
-    return left, right
- 
-# Calculate the Gini index for a split dataset
-def gini_index(groups, classes):
-	# count all samples at split point
-	n_instances = float(sum([len(group) for group in groups]))
-	# sum weighted Gini index for each group
-	gini = 0.0
-	for group in groups:
-		if float(len(group)) == 0: continue
-		score = 0.0
-		# score the group based on the score for each class
-		for class_val in classes:
-			p = [row[-1] for row in group].count(class_val) / float(len(group))
-			score += p * p
-		# weight the group score by its relative size
-		gini += (1.0 - score) * (float(len(group)) / n_instances)
-	return gini
- 
-# Select the best split point for a dataset
-def get_split(dataset):
-	class_values = list(set(row[-1] for row in dataset))
-	b_index, b_value, b_score, b_groups = 999, 999, 999, None
-	for index in range(len(dataset[0])-1):
-		for row in dataset:
-			groups = test_split(index, row[index], dataset)
-			gini = gini_index(groups, class_values)
-			if gini < b_score:
-				b_index, b_value, b_score, b_groups = index, row[index], gini, groups
-	return {'index':b_index, 'value':b_value, 'groups':b_groups}
- 
-# Create a terminal node value
-def to_terminal(group):
-	outcomes = [row[-1] for row in group]
-	return max(set(outcomes), key=outcomes.count)
- 
-# Create child splits for a node or make terminal
-def split(node, max_depth, min_size, depth):
-	left, right = node['groups']
-	del(node['groups'])
-	# check for a no split
-	if not left or not right:
-		node['left'] = node['right'] = to_terminal(left + right)
-		return
-	# process left child
-	if len(left) <= min_size:
-		node['left'] = to_terminal(left)
-	else:
-		node['left'] = get_split(left)
-		split(node['left'], max_depth, min_size, depth+1)
-	# process right child
-	if len(right) <= min_size:
-		node['right'] = to_terminal(right)
-	else:
-		node['right'] = get_split(right)
-		split(node['right'], max_depth, min_size, depth+1)
- 
-# Build a decision tree
-def build_tree(train, max_depth, min_size):
-	root = get_split(train)
-	split(root, max_depth, min_size, 1)
-	return root
- 
-# Print a decision tree
-def print_tree(node, depth=0):
-	if isinstance(node, dict):
-		print('%s[X%d < %.3f]' % ((depth*' ', (node['index']+1), node['value'])))
-		print_tree(node['left'], depth+1)
-		print_tree(node['right'], depth+1)
-	else:
-		print('%s[%s]' % ((depth*' ', node)))
- 
 data = [
-    [1, 0, 1, 0, 0, 0, 1], # A1
-    [1, 0, 1, 1, 0, 0, 1], # A2
-    [1, 0, 1, 0, 1, 0, 1], # A3
-    [1, 1, 0, 0, 1, 1, 1], # A4
-    [1, 1, 1, 1, 0, 0, 1], # A5
-    [1, 0, 0, 0, 1, 1, 1], # A6
-    [1, 0, 0, 0, 1, 0, 0], # A7
-    [0, 1, 1, 1, 0, 1, 1], # A8
-    [0, 1, 1, 0, 1, 1, 0], # A9
-    [0, 0, 0, 1, 1, 0, 0], # A10
-    [0, 1, 0, 1, 0, 1, 0], # A11
-    [0, 0, 0, 1, 0, 1, 0], # A12
-    [0, 1, 1, 0, 1, 1, 0], # A13
-    [0, 1, 1, 1, 0, 0, 0]  # A14
+    [1, 0, 1, 0, 0, 0], # A1
+    [1, 0, 1, 1, 0, 0], # A2
+    [1, 0, 1, 0, 1, 0], # A3
+    [1, 1, 0, 0, 1, 1], # A4
+    [1, 1, 1, 1, 0, 0], # A5
+    [1, 0, 0, 0, 1, 1], # A6
+    [1, 0, 0, 0, 1, 0], # A7
+    [0, 1, 1, 1, 0, 1], # A8
+    [0, 1, 1, 0, 1, 1], # A9
+    [0, 0, 0, 1, 1, 0], # A10
+    [0, 1, 0, 1, 0, 1], # A11
+    [0, 0, 0, 1, 0, 1], # A12
+    [0, 1, 1, 0, 1, 1], # A13
+    [0, 1, 1, 1, 0, 0]  # A14
 ]
 
-tree = build_tree(data, 1)
-print_tree(tree)
+weights = [1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0]
+
+_, ax = plt.subplots()
+tree.plot_tree(tree.DecisionTreeClassifier(criterion = 'entropy').fit(data, weights), filled = True, ax = ax, feature_names = ['A_1', 'A_2', 'A_3', 'A_4', 'A_5', 'A_6', 'A_7', 'A_8', 'A_9', 'A_10', 'A_11', 'A_12', 'A_13', 'A_14'])
+plt.show()
